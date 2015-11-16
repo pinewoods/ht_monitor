@@ -9,12 +9,13 @@ void setup()
 {
 
   dht.setup(2); // data pin 2
-  ht_protocol_setup();
+  htProtocolSetup();
 }
 
 void loop()
 {
-  if(ht_state) ht_protocol_loop();
+  digitalWrite(LED_BUILTIN, LOW);
+  if(ht_state) htProtocolLoop();
   
   delay(dht.getMinimumSamplingPeriod());
   Serial.print(dht.getHumidity());

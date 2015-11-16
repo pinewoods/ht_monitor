@@ -1,8 +1,17 @@
 #include <avr/interrupt.h>
+#include "is_double.h"
 
 #define SSID_SIZE 32
 #define PASSWD_SIZE 32
 #define E2PROM_DEBUG
+
+#define RX_BUFFER_SIZE 64
+#define RX_TIMEOUT_MS 1000
+
+#define OK_RESPONSE 20
+#define NO_RESPONSE 23
+#define NOT_FOUND_RESPONSE 44
+#define ERROR_RESPONSE 50
 
 /*
 ISR_ADDR reference for AtMega328
@@ -28,12 +37,11 @@ struct config_t
     char passwd[PASSWD_SIZE];
 } configuration;
 
-void ht_protocol_setup();
-void ht_protocol_trigger();
-void ht_protocol_loop();
+void htProtocolSetup();
+void htProtocolTrigger();
+void htProtocolLoop();
 
-
-void ht_protocol_setup(){
+void htProtocolSetup(){
   Serial.begin(9600);
   
   pinMode(LED_BUILTIN, OUTPUT);
@@ -41,7 +49,7 @@ void ht_protocol_setup(){
   
   EEPROM_readAnything(0, configuration);
 
-  attachInterrupt(ISR_ADDR, ht_protocol_trigger, RISING);
+  attachInterrupt(ISR_ADDR, htProtocolTrigger, RISING);
     
   #ifdef E2PROM_DEBUG 
     Serial.print("TARGET_MIN_TEMP: ");
@@ -59,33 +67,78 @@ void ht_protocol_setup(){
   #endif
 }
 
-void ht_protocol_trigger(){
+void htProtocolTrigger(){
    detachInterrupt(ISR_ADDR);
    ht_state = HIGH;
    digitalWrite(LED_BUILTIN, HIGH);
 }
 
-void ht_protocol_loop(){
-  Serial.println("HT PROTOCOL VERSION 0.0");
-  while(1){
+void htProtocolLoop(){
+
+    char buffer[RX_BUFFER_SIZE] = "";
+    //memset(buffer,0,RX_BUFFER_SIZE);
+    Serial.setTimeout(RX_TIMEOUT_MS);
+
+    float fvalue;
+    char svalue[RX_BUFFER_SIZE] = "";
+    memset(svalue,0,RX_BUFFER_SIZE);
+
+    Serial.println("HT PROTOCOL VERSION 0.0");
     digitalWrite(LED_BUILTIN, HIGH);
-    delay(1000);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(1000);
 
-  }
-}
-  
- /* 
+    while(1){
 
-void get_target_min_temp(){
-  // GET TARGET_MIN_TEMP
-  Serial.println(configuration.target_min_temp);
-}
+        char error_flag = NO_RESPONSE;
+        memset(buffer, 0, RX_BUFFER_SIZE);
+        int msg_len = Serial.readBytesUntil('\n', buffer, RX_BUFFER_SIZE);
 
-void get_target_min_temp(String instr){
-  // SET TARGET_MIN_TEMP {float}
-  // TODO: Parse instr
- configuration.target_min_temp = instr.toFloat();
-}
-*/
+        if(msg_len){
+
+          // PROTOCOL
+            if(strstr(buffer, "GET TARGET_MIN_TEMP")){
+                Serial.println(configuration.target_min_temp);
+                error_flag = OK_RESPONSE;
+            }
+
+            if(strstr(buffer, "SET TARGET_MIN_TEMP")){
+                sscanf(buffer, "SET TARGET_MIN_TEMP %s", svalue);
+
+                if(isDouble(svalue)){
+                    configuration.target_min_temp = strtod(svalue, NULL);
+                    EEPROM_writeAnything(0, configuration);
+                    error_flag = OK_RESPONSE;
+                }else{
+                    error_flag = ERROR_RESPONSE;
+                }
+          }
+
+            // No valid command found
+            //if(error_flag != OK_RESPONSE && error_flag != ERROR_RESPONSE){
+            if(error_flag == NO_RESPONSE){
+                error_flag = NOT_FOUND_RESPONSE;
+            }
+
+           // RESPONSE
+            switch(error_flag){
+
+                case OK_RESPONSE:
+                    Serial.println("OK");
+                    break;
+
+                case NOT_FOUND_RESPONSE:
+                    Serial.print("ERROR ");
+                    Serial.println(NOT_FOUND_RESPONSE);
+                    break;
+
+                case ERROR_RESPONSE:
+                    Serial.print("ERROR ");
+                    Serial.println(ERROR_RESPONSE);
+                    break;
+
+                default:
+                    break;
+            } // end switch
+
+        } // end if msg_len
+    } // end while
+} // end
