@@ -24,6 +24,10 @@ attachInterrupt - Name - Pin on chip - Pin on board
 
 volatile char ht_state = LOW;
 
+#define SERIAL Serial
+// #define SERIAL cmdSerial
+// SoftwareSerial cmdSerial(10,  11); /* RX:D10, TX:D11 */
+
 struct config_t
 {
     // User defined data
@@ -42,7 +46,7 @@ void htProtocolTrigger();
 void htProtocolLoop();
 
 void htProtocolSetup(){
-  Serial.begin(9600);
+  // SERIAL.begin(9600);
   
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
@@ -52,18 +56,18 @@ void htProtocolSetup(){
   attachInterrupt(ISR_ADDR, htProtocolTrigger, RISING);
     
   #ifdef E2PROM_DEBUG 
-    Serial.print("TARGET_MIN_TEMP: ");
-    Serial.println(configuration.target_min_temp); 
-    Serial.print("TARGET_MAX_TEMP: ");
-    Serial.println(configuration.target_temp_max); 
-    Serial.print("MIN_TEMP: ");
-    Serial.println(configuration.min_temp); 
-    Serial.print("TEMP_MAX: ");
-    Serial.println(configuration.temp_max); 
-    Serial.print("SSID: ");
-    Serial.println(configuration.ssid); 
-    Serial.print("PASSWD: ");
-    Serial.println(configuration.passwd); 
+    SERIAL.print("TARGET_MIN_TEMP: ");
+    SERIAL.println(configuration.target_min_temp); 
+    SERIAL.print("TARGET_MAX_TEMP: ");
+    SERIAL.println(configuration.target_temp_max); 
+    SERIAL.print("MIN_TEMP: ");
+    SERIAL.println(configuration.min_temp); 
+    SERIAL.print("TEMP_MAX: ");
+    SERIAL.println(configuration.temp_max); 
+    SERIAL.print("SSID: ");
+    SERIAL.println(configuration.ssid); 
+    SERIAL.print("PASSWD: ");
+    SERIAL.println(configuration.passwd); 
   #endif
 }
 
@@ -77,26 +81,26 @@ void htProtocolLoop(){
 
     char buffer[RX_BUFFER_SIZE] = "";
     //memset(buffer,0,RX_BUFFER_SIZE);
-    Serial.setTimeout(RX_TIMEOUT_MS);
+    SERIAL.setTimeout(RX_TIMEOUT_MS);
 
     float fvalue;
     char svalue[RX_BUFFER_SIZE] = "";
     memset(svalue,0,RX_BUFFER_SIZE);
 
-    Serial.println("HT PROTOCOL VERSION 0.0");
+    SERIAL.println("HT PROTOCOL VERSION 0.0");
     digitalWrite(LED_BUILTIN, HIGH);
 
     while(1){
 
         char error_flag = NO_RESPONSE;
         memset(buffer, 0, RX_BUFFER_SIZE);
-        int msg_len = Serial.readBytesUntil('\n', buffer, RX_BUFFER_SIZE);
+        int msg_len = SERIAL.readBytesUntil('\n', buffer, RX_BUFFER_SIZE);
 
         if(msg_len){
 
           // PROTOCOL
             if(strstr(buffer, "GET TARGET_MIN_TEMP")){
-                Serial.println(configuration.target_min_temp);
+                SERIAL.println(configuration.target_min_temp);
                 error_flag = OK_RESPONSE;
             }
 
@@ -122,17 +126,17 @@ void htProtocolLoop(){
             switch(error_flag){
 
                 case OK_RESPONSE:
-                    Serial.println("OK");
+                    SERIAL.println("OK");
                     break;
 
                 case NOT_FOUND_RESPONSE:
-                    Serial.print("ERROR ");
-                    Serial.println(NOT_FOUND_RESPONSE);
+                    SERIAL.print("ERROR ");
+                    SERIAL.println(NOT_FOUND_RESPONSE);
                     break;
 
                 case ERROR_RESPONSE:
-                    Serial.print("ERROR ");
-                    Serial.println(ERROR_RESPONSE);
+                    SERIAL.print("ERROR ");
+                    SERIAL.println(ERROR_RESPONSE);
                     break;
 
                 default:
