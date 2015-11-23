@@ -1,4 +1,5 @@
 #include <avr/interrupt.h>
+//#include "AltSoftSerial.h"
 #include "is_double.h"
 
 #define SSID_SIZE 32
@@ -24,9 +25,10 @@ attachInterrupt - Name - Pin on chip - Pin on board
 
 volatile char ht_state = LOW;
 
-#define SERIAL Serial
-// #define SERIAL cmdSerial
-// SoftwareSerial cmdSerial(10,  11); /* RX:D10, TX:D11 */
+//#define DEBUG_SERIAL Serial
+#define DEBUG_SERIAL cmdSerial
+SoftwareSerial DEBUG_SERIAL(9, 8); /* RX:D10, TX:D11 */
+//AltSoftSerial DEBUG_SERIAL; /* RX:8  TX:9 Unusable:10 */
 
 struct config_t
 {
@@ -46,7 +48,7 @@ void htProtocolTrigger();
 void htProtocolLoop();
 
 void htProtocolSetup(){
-  // SERIAL.begin(9600);
+  // DEBUG_SERIAL.begin(9600);
   
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
@@ -54,21 +56,7 @@ void htProtocolSetup(){
   EEPROM_readAnything(0, configuration);
 
   attachInterrupt(ISR_ADDR, htProtocolTrigger, RISING);
-    
-  #ifdef E2PROM_DEBUG 
-    SERIAL.print("TARGET_MIN_TEMP: ");
-    SERIAL.println(configuration.target_min_temp); 
-    SERIAL.print("TARGET_MAX_TEMP: ");
-    SERIAL.println(configuration.target_temp_max); 
-    SERIAL.print("MIN_TEMP: ");
-    SERIAL.println(configuration.min_temp); 
-    SERIAL.print("TEMP_MAX: ");
-    SERIAL.println(configuration.temp_max); 
-    SERIAL.print("SSID: ");
-    SERIAL.println(configuration.ssid); 
-    SERIAL.print("PASSWD: ");
-    SERIAL.println(configuration.passwd); 
-  #endif
+
 }
 
 void htProtocolTrigger(){
@@ -81,26 +69,43 @@ void htProtocolLoop(){
 
     char buffer[RX_BUFFER_SIZE] = "";
     //memset(buffer,0,RX_BUFFER_SIZE);
-    SERIAL.setTimeout(RX_TIMEOUT_MS);
+    DEBUG_SERIAL.setTimeout(RX_TIMEOUT_MS);
 
     float fvalue;
     char svalue[RX_BUFFER_SIZE] = "";
     memset(svalue,0,RX_BUFFER_SIZE);
 
-    SERIAL.println("HT PROTOCOL VERSION 0.0");
+    DEBUG_SERIAL.println("\nHT PROTOCOL VERSION 0.0\n");
     digitalWrite(LED_BUILTIN, HIGH);
 
-    while(1){
+    #ifdef E2PROM_DEBUG
+      DEBUG_SERIAL.print("TARGET_MIN_TEMP: ");
+      DEBUG_SERIAL.println(configuration.target_min_temp);
+      DEBUG_SERIAL.print("TARGET_MAX_TEMP: ");
+      DEBUG_SERIAL.println(configuration.target_temp_max);
+      DEBUG_SERIAL.print("MIN_TEMP: ");
+      DEBUG_SERIAL.println(configuration.min_temp);
+      DEBUG_SERIAL.print("TEMP_MAX: ");
+      DEBUG_SERIAL.println(configuration.temp_max);
+      DEBUG_SERIAL.print("SSID: ");
+      DEBUG_SERIAL.println(configuration.ssid);
+      DEBUG_SERIAL.print("PASSWD: ");
+      DEBUG_SERIAL.println(configuration.passwd);
+    #endif
 
+    while(1){
+        DEBUG_SERIAL.listen();
         char error_flag = NO_RESPONSE;
         memset(buffer, 0, RX_BUFFER_SIZE);
-        int msg_len = SERIAL.readBytesUntil('\n', buffer, RX_BUFFER_SIZE);
+        int msg_len = DEBUG_SERIAL.readBytesUntil('\n', buffer, RX_BUFFER_SIZE);
 
         if(msg_len){
 
-          // PROTOCOL
+            // PROTOCOL
+            /* ********************** TARGET_MIN_TEMP ********************** */
+
             if(strstr(buffer, "GET TARGET_MIN_TEMP")){
-                SERIAL.println(configuration.target_min_temp);
+                DEBUG_SERIAL.println(configuration.target_min_temp);
                 error_flag = OK_RESPONSE;
             }
 
@@ -114,7 +119,26 @@ void htProtocolLoop(){
                 }else{
                     error_flag = ERROR_RESPONSE;
                 }
-          }
+            }
+            /* ********************** SSID ********************** */
+
+             if(strstr(buffer, "GET SSID")){
+                DEBUG_SERIAL.println(configuration.ssid);
+                error_flag = OK_RESPONSE;
+            }
+
+            if(strstr(buffer, "SET SSID")){
+                sscanf(buffer, "SET SSID \"%[^\"]", svalue);
+
+                if(svalue){
+                    strcpy(configuration.ssid, svalue);
+                    EEPROM_writeAnything(0, configuration);
+                    error_flag = OK_RESPONSE;
+                }else{
+                    error_flag = ERROR_RESPONSE;
+                }
+            }
+            /* ********************** END ********************** */
 
             // No valid command found
             //if(error_flag != OK_RESPONSE && error_flag != ERROR_RESPONSE){
@@ -126,17 +150,17 @@ void htProtocolLoop(){
             switch(error_flag){
 
                 case OK_RESPONSE:
-                    SERIAL.println("OK");
+                    DEBUG_SERIAL.println("OK");
                     break;
 
                 case NOT_FOUND_RESPONSE:
-                    SERIAL.print("ERROR ");
-                    SERIAL.println(NOT_FOUND_RESPONSE);
+                    DEBUG_SERIAL.print("ERROR ");
+                    DEBUG_SERIAL.println(NOT_FOUND_RESPONSE);
                     break;
 
                 case ERROR_RESPONSE:
-                    SERIAL.print("ERROR ");
-                    SERIAL.println(ERROR_RESPONSE);
+                    DEBUG_SERIAL.print("ERROR ");
+                    DEBUG_SERIAL.println(ERROR_RESPONSE);
                     break;
 
                 default:
