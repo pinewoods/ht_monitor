@@ -28,20 +28,52 @@ void setup()
 
   ESP_SERIAL.begin(115200);
   DEBUG_SERIAL.begin(9600);
+
+  DEBUG_SERIAL.print("ESP8622: ");
+  DEBUG_SERIAL.println(v);
+
+  /*
+  uint8_t mode = -1;
+  bool station_mode = wifi.qATCWMODE(&mode);
+  if(!station_mode){
+    DEBUG_SERIAL.println("qATCWMODE ERROR");
+  }else{
+    DEBUG_SERIAL.print("setOprToStation: ");
+    DEBUG_SERIAL.println(mode);
+  }
+  */
+
+  bool station_error = wifi.setOprToStation();
+  if(!station_error){
+    DEBUG_SERIAL.println("setOprToStation ERROR");
+  }
+  String aplist = wifi.getAPList();
+  DEBUG_SERIAL.print("APLIST: ");
+  DEBUG_SERIAL.println(aplist);
+
+
+  // AP CONNECTION
+  EEPROM_readAnything(0, configuration);
+  bool joinap_error = wifi.joinAP(configuration.ssid, configuration.passwd);
+  if(!joinap_error){
+    DEBUG_SERIAL.println("joinAP ERROR");
+  }else{
+    DEBUG_SERIAL.print("Connect to: ");
+    DEBUG_SERIAL.print(configuration.ssid);
+    DEBUG_SERIAL.println(wifi.getLocalIP());
+  }
 }
 
 void loop()
 {
   digitalWrite(LED_BUILTIN, LOW);
-  if(ht_state) htProtocolLoop();
+  if(ht_state){
+    wifi.leaveAP();
+    htProtocolLoop();
+  }
 
-  /*
   //ESP_SERIAL.listen();
   String v = wifi.getVersion();
-
-  DEBUG_SERIAL.print("ESP8622: ");
-  DEBUG_SERIAL.println(v);
-  */
 
   //delay(dht.getMinimumSamplingPeriod());
   delay(2000);
@@ -50,11 +82,4 @@ void loop()
   DEBUG_SERIAL.print(" ");
   DEBUG_SERIAL.println(dht.getTemperature());
 
-}
-
-String connect(){
-  wifi.setOprToStation(); // Set operation mode to staion.
-  wifi.joinAP (configuration.ssid, configuration.passwd); //Join in AP.
-  return wifi.getLocalIP(); // Get the IP address of ESP8266.
-  //leaveAP(); Leave AP joined before.
 }

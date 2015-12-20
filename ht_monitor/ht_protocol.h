@@ -138,6 +138,24 @@ void htProtocolLoop(){
                     error_flag = ERROR_RESPONSE;
                 }
             }
+            /* ********************** PASSWD ********************** */
+
+             if(strstr(buffer, "GET PASSWD")){
+                DEBUG_SERIAL.println(configuration.passwd);
+                error_flag = OK_RESPONSE;
+             }
+
+            if(strstr(buffer, "SET PASSWD")){
+                sscanf(buffer, "SET PASSWD \"%[^\"]", svalue);
+
+                if(svalue){
+                    strcpy(configuration.passwd, svalue);
+                    EEPROM_writeAnything(0, configuration);
+                    error_flag = OK_RESPONSE;
+                }else{
+                    error_flag = ERROR_RESPONSE;
+                }
+            }
             /* ********************** END ********************** */
 
             // No valid command found
