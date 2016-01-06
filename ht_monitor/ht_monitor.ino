@@ -69,8 +69,13 @@ void setup()
   wifi.disableMUX();
 }
 
+// If this was declared inside loop's scope, it causes crashes
+char json_payload[64]="";
+char tcp_payload[256]="";
+
 void loop()
 {
+
   digitalWrite(LED_BUILTIN, LOW);
   if(ht_state){
     wifi.leaveAP();
@@ -81,18 +86,14 @@ void loop()
   //delay(2000);
   delay(15000);
 
-  DEBUG_SERIAL.print("DHT22: ");
-  DEBUG_SERIAL.print(dht.getHumidity());
-  DEBUG_SERIAL.print(" ");
-  DEBUG_SERIAL.println(dht.getTemperature());
-
-  char json_payload[64]="";
-  char tcp_payload[1024]="";
   dht_json_wrapper(json_payload, 64, dht.getHumidity(), dht.getTemperature());
-  http_wrapper(tcp_payload, 1024, json_payload, strlen(json_payload));
-  DEBUG_SERIAL.println(json_payload);
+  http_wrapper(tcp_payload, 256, json_payload, strlen(json_payload));
+
+  DEBUG_SERIAL.print("strlen(tcp_payload): ");
+  DEBUG_SERIAL.println(strlen(tcp_payload));
   DEBUG_SERIAL.println(tcp_payload);
 
+  /*
   // SEND DATA
   bool tcp_error = wifi.createTCP ("192.168.0.134", 8000);
   // Create TCP connection in single mode.
@@ -104,5 +105,5 @@ void loop()
     //bool releaseTCP (void) : Release TCP connection in single mode.
     wifi.releaseTCP();
   }
-
+  */
 }
