@@ -1,3 +1,5 @@
+#define HTTP_PAYLOAD_SIZE 256
+
 bool dht_json_wrapper(char *json_payload,
                                   const uint8_t len_json_payload,
                                   const uint8_t get_humidity,
@@ -27,9 +29,9 @@ bool http_wrapper(char *tcp_payload,
     len_http_payload -> strlen of your POST request
     */
 
-    // HTTP headers - 88 bytes + strlen(%d) + strlen(%s)
+    // HTTP headers - 93 bytes + strlen(%d) + strlen(%s)
     const char http_headers[] =
-    "POST / HTTP/1.0\r\n"
+    "POST /api2/ HTTP/1.0\r\n" // TODO: Parametric Endpoint
     "Content-Type:application/json \r\n"
     "Connection: close\r\n"
     "Content-Length: %d\r\n"

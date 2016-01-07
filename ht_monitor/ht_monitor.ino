@@ -17,6 +17,26 @@
 ESP8266 wifi(ESP_SERIAL);
 DHT dht;
 
+bool pw_joinap(){
+    EEPROM_readAnything(0, configuration);
+    bool joinap_error = wifi.joinAP(configuration.ssid, configuration.passwd);
+    if(joinap_error==false){
+      DEBUG_SERIAL.println("joinAP ERROR");
+    }else{
+      DEBUG_SERIAL.print("Connected to: ");
+      DEBUG_SERIAL.println(configuration.ssid);
+      DEBUG_SERIAL.println(wifi.getLocalIP());
+    }
+    return joinap_error;
+}
+
+bool pw_leaveap(){
+  bool leaveap_error = wifi.leaveAP();
+  DEBUG_SERIAL.print("leaveap_error: ");
+  DEBUG_SERIAL.println(leaveap_error);
+  return leaveap_error;
+}
+
 void setup()
 {
   // pinMode(10, INPUT);
@@ -42,16 +62,7 @@ void setup()
     DEBUG_SERIAL.print("APLIST: ");
     DEBUG_SERIAL.println(aplist);
 
-    // JOIN AP
-    EEPROM_readAnything(0, configuration);
-    bool joinap_error = wifi.joinAP(configuration.ssid, configuration.passwd);
-    if(joinap_error==false){
-      DEBUG_SERIAL.println("joinAP ERROR");
-    }else{
-      DEBUG_SERIAL.print("Connected to: ");
-      DEBUG_SERIAL.println(configuration.ssid);
-      DEBUG_SERIAL.println(wifi.getLocalIP());
-    }
+
     // Disable IP MUX(single connection mode).
     wifi.disableMUX();
   }
@@ -65,20 +76,22 @@ void loop()
     htProtocolLoop();
   }
 
-  //delay(dht.getMinimumSamplingPeriod());
-  //delay(2000);
-  delay(15000);
-
   char json_payload[64]="";
-  char tcp_payload[256]="";
+  char tcp_payload[HTTP_PAYLOAD_SIZE]="";
 
   dht_json_wrapper(json_payload, 64, dht.getHumidity(), dht.getTemperature());
-  http_wrapper(tcp_payload, 256, json_payload, strlen(json_payload));
+  http_wrapper(tcp_payload, HTTP_PAYLOAD_SIZE, json_payload, strlen(json_payload));
 
   DEBUG_SERIAL.print("strlen(tcp_payload): ");
   DEBUG_SERIAL.println(strlen(tcp_payload));
   DEBUG_SERIAL.println(tcp_payload);
 
+  // JOIN AP
+  bool joinap_error = pw_joinap();
+  if(joinap_error==false){
+    pw_leaveap();
+    return;
+  }
 
   // SEND DATA
   bool tcp_error = wifi.createTCP ("192.168.0.134", 8000);
@@ -86,10 +99,17 @@ void loop()
   if(tcp_error==false){
     DEBUG_SERIAL.println("createTCP ERROR");
   }else{
+    // Casting is needed
     //bool send (const uint8_t *buffer, uint32_t len) : Send data based on TCP or UDP builded already in single mode. 
-    //send (const uint8_t *buffer, uint32_t len);
+    wifi.send ((uint8_t *)tcp_payload, (uint32_t) strlen(tcp_payload));
     //bool releaseTCP (void) : Release TCP connection in single mode.
     wifi.releaseTCP();
   }
+
+  pw_leaveap();
+
+  //delay(dht.getMinimumSamplingPeriod());
+  //delay(2000);
+  delay(15000);
 
 }
