@@ -6,7 +6,7 @@
 
 #include "EEPROMAnything.h"
 #include "ht_protocol.h"
-#include "custom_esp.h"
+#include "simple_http.h"
 
 #define ESP8266_USE_SOFTWARE_SERIAL
 #define SERIAL_BUFFER_SIZE 256
@@ -94,7 +94,7 @@ void loop()
   }
 
   // SEND DATA
-  bool tcp_error = wifi.createTCP ("192.168.0.134", 8000);
+  bool tcp_error = wifi.createTCP ("192.168.0.134", 8000); // TODO: Parametric Endpoint
   // Create TCP connection in single mode.
   if(tcp_error==false){
     DEBUG_SERIAL.println("createTCP ERROR");
