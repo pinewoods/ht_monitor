@@ -1,12 +1,3 @@
-/*
-String connect(){
-  wifi.setOprToStation(); // Set operation mode to staion.
-  wifi.joinAP (configuration.ssid, configuration.passwd); //Join in AP.
-  return wifi.getLocalIP(); // Get the IP address of ESP8266.
-  //leaveAP(); Leave AP joined before.
-}
-*/
-
 bool dht_json_wrapper(char *json_payload,
                                   const uint8_t len_json_payload,
                                   const uint8_t get_humidity,
