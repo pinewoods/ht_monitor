@@ -5,6 +5,8 @@
 
 //#define ESP8266_USE_SOFTWARE_SERIAL
 #define SERIAL_BUFFER_SIZE 256
+#define TCP_BUFFER_SIZE 256
+
 #define ESP_SERIAL Serial
 
 //#define DEBUG_SERIAL Serial
@@ -32,13 +34,18 @@ void setup()
   // bool setSoftAPParam (String ssid, String pwd, uint8_t chl=7, uint8_t ecn=4)
   wifi.setSoftAPParam("ESP8266", "foobar");
 
+  // Disable IP MUX(single connection mode).
+  wifi.disableMUX();
+
   // SET SOFTAP
   bool station_error =  wifi.setOprToSoftAP();
   if(station_error==false){
     DEBUG_SERIAL.println("setOprToStation ERROR");
   }else{
     DEBUG_SERIAL.print("SUCCESS");
-
+    // Create TCP connection in single mode.
+    // createTCP (String addr, uint32_t port)
+    wifi.createTCP ("192.168.0.1", 80);
   }
 }
 
@@ -57,6 +64,13 @@ void loop()
     String gjdi = wifi.getJoinedDeviceIP();
     DEBUG_SERIAL.println(gjdi);
 
-    delay(1000);
+    uint8_t buffer[TCP_BUFFER_SIZE];
+    memset(buffer, 0, sizeof(uint8_t)*TCP_BUFFER_SIZE);
 
+    // Receive data from TCP or UDP builded already in single mode.
+    // uint32_t recv (uint8_t *buffer, uint32_t buffer_size, uint32_t timeout=1000)
+    wifi.recv(buffer, TCP_BUFFER_SIZE);
+
+    //DEBUG_SERIAL.println(buffer);
+    //delay(1000);
 }
