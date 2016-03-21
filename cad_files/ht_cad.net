@@ -1,0 +1,317 @@
+# EESchema Netlist Version 1.1 created  Tue 08 Mar 2016 09:27:46 PM BRT
+(
+ ( /56D4D221 bornier2 BT5V1 BATTERY
+  ( 1 +5V )
+  ( 2 +5V )
+ )
+ ( /56D4D204 bornier2 BT12V1 BATTERY
+  ( 1 +12V )
+  ( 2 +5V )
+ )
+ ( /56D23CFB CP4 C1 0.33uF
+  ( 1 +12V )
+  ( 2 +5V )
+ )
+ ( /56D23A83 CP4 C2 0.1uF
+  ( 1 +5V )
+  ( 2 +5V )
+ )
+ ( /56D23D70 C2V8 C3 10uF
+  ( 1 +5V )
+  ( 2 +3.3V )
+ )
+ ( /56D36A6D CP4 C4 22pF
+  ( 1 N-000001 )
+  ( 2 +5V )
+ )
+ ( /56D36A78 CP4 C5 22pF
+  ( 1 +5V )
+  ( 2 N-000002 )
+ )
+ ( /56D38036 LED-3MM D1 LED
+  ( 1 N-000038 )
+  ( 2 N-000010 )
+ )
+ ( /56D3724A LED-3MM D2 LED
+  ( 1 N-000033 )
+  ( 2 N-000006 )
+ )
+ ( /56D21AAB DIL28 IC1 ATMEGA328-P
+  ( 1 N-000041 )
+  ( 2 N-000022 )
+  ( 3 N-000035 )
+  ( 4 N-000007 )
+  ( 5 N-000021 )
+  ( 6 ? )
+  ( 7 +5V )
+  ( 8 +5V )
+  ( 9 N-000002 )
+  ( 10 N-000001 )
+  ( 11 N-000033 )
+  ( 12 ? )
+  ( 13 N-000040 )
+  ( 14 N-000043 )
+  ( 15 ? )
+  ( 16 N-000028 )
+  ( 17 N-000044 )
+  ( 18 ? )
+  ( 19 ? )
+  ( 20 +5V )
+  ( 21 +5V )
+  ( 22 +5V )
+  ( 23 ? )
+  ( 24 ? )
+  ( 25 ? )
+  ( 26 ? )
+  ( 27 N-000039 )
+  ( 28 N-000025 )
+ )
+ ( /56D4D39C PIN_ARRAY_4x1 P1 CONN_4
+  ( 1 N-000044 )
+  ( 2 N-000028 )
+  ( 3 +5V )
+  ( 4 +5V )
+ )
+ ( /56D4CB3B PIN_ARRAY_4x1 P2 CONN_4
+  ( 1 ? )
+  ( 2 N-000021 )
+  ( 3 +5V )
+  ( 4 +5V )
+ )
+ ( /56D4CB44 PIN_ARRAY_4x1 P3 CONN_4
+  ( 1 N-000040 )
+  ( 2 N-000043 )
+  ( 3 +5V )
+  ( 4 +5V )
+ )
+ ( /56D4CB4A PIN_ARRAY_4x1 P4 CONN_4
+  ( 1 N-000025 )
+  ( 2 N-000039 )
+  ( 3 +5V )
+  ( 4 +5V )
+ )
+ ( /56D24581 TO92 Q1 BC548
+  ( 1 N-000022 )
+  ( 2 N-000004 )
+  ( 3 N-000018 )
+ )
+ ( /56D242BB R1 R1 10K
+  ( 1 N-000036 )
+  ( 2 N-000035 )
+ )
+ ( /56D242C3 R1 R2 20K
+  ( 1 +5V )
+  ( 2 N-000036 )
+ )
+ ( /56D244D2 R1 R3 2K2
+  ( 1 N-000004 )
+  ( 2 +3.3V )
+ )
+ ( /56D24427 R1 R4 6K8
+  ( 1 +5V )
+  ( 2 N-000022 )
+ )
+ ( /56D36C5A R1 R5 1M
+  ( 1 N-000001 )
+  ( 2 N-000002 )
+ )
+ ( /56D3671F R1 R6 10K
+  ( 1 ? )
+  ( 2 N-000007 )
+ )
+ ( /56D37268 R1 R7 1K
+  ( 1 +5V )
+  ( 2 N-000006 )
+ )
+ ( /56D37A49 R1 R8 10K
+  ( 1 N-000034 )
+  ( 2 +3.3V )
+ )
+ ( /56D37F8C R1 R9 10K
+  ( 1 N-000019 )
+  ( 2 +3.3V )
+ )
+ ( /56D38035 R1 R10 1K
+  ( 1 +5V )
+  ( 2 N-000010 )
+ )
+ ( /56D36FBB R1 R11 10K
+  ( 1 +5V )
+  ( 2 N-000041 )
+ )
+ ( /56D366B3 SW_PUSH SW1 SW_PUSH
+  ( 1 +5V )
+  ( 2 N-000007 )
+ )
+ ( /56D36675 SW_PUSH SW2 SW_PUSH
+  ( 1 +5V )
+  ( 2 N-000041 )
+ )
+ ( /56D237F0 TO220_VERT U1 LM1117T-3.3
+  ( 1 +5V )
+  ( 2 +3.3V )
+  ( 3 +5V )
+ )
+ ( /56D232C0 TO220_VERT U2 7805
+  ( GND +5V )
+  ( VI +12V )
+  ( VO +5V )
+ )
+ ( /56D23FA6 $noname$ U3 ESP-12
+  ( 1 ? )
+  ( 2 ? )
+  ( 3 N-000034 )
+  ( 4 ? )
+  ( 5 ? )
+  ( 6 ? )
+  ( 7 ? )
+  ( 8 +3.3V )
+  ( 9 +5V )
+  ( 10 +5V )
+  ( 11 ? )
+  ( 12 N-000019 )
+  ( 13 ? )
+  ( 14 N-000038 )
+  ( 15 N-000036 )
+  ( 16 N-000018 )
+ )
+ ( /56D36A16 HC-18UV X1 QUARTZCMS4
+  ( 1 N-000001 )
+  ( 3 N-000002 )
+ )
+)
+*
+{ Allowed footprints by component:
+$component C1
+ SM*
+ C?
+ C1-1
+$endlist
+$component C2
+ SM*
+ C?
+ C1-1
+$endlist
+$component C3
+ SM*
+ C?
+ C1-1
+$endlist
+$component C4
+ SM*
+ C?
+ C1-1
+$endlist
+$component C5
+ SM*
+ C?
+ C1-1
+$endlist
+$component D1
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component D2
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component IC1
+ 28DIP-ELL600
+ 28dip600
+$endlist
+$component Q1
+ TO92*
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R3
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R4
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R5
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R6
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R7
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R8
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R9
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R10
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R11
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component U3
+ ESP-07*
+ ESP-12*
+$endlist
+$endfootprintlist
+}
