@@ -30,23 +30,26 @@ void setup()
   lcd.print("Nivel: ");
   delay(1000);
 
-  // Set SoftAP parameters.
-  // bool setSoftAPParam (String ssid, String pwd, uint8_t chl=7, uint8_t ecn=4)
-  wifi.setSoftAPParam("ESP8266", "foobar");
-
-  // Disable IP MUX(single connection mode).
-  wifi.disableMUX();
-
   // SET SOFTAP
   bool station_error =  wifi.setOprToSoftAP();
   if(station_error==false){
     DEBUG_SERIAL.println("setOprToStation ERROR");
   }else{
     DEBUG_SERIAL.print("SUCCESS");
-    // Create TCP connection in single mode.
-    // createTCP (String addr, uint32_t port)
-    wifi.createTCP ("192.168.0.1", 80);
   }
+
+  // Required for Server
+  // Enable IP MUX(multiple connection mode).
+  wifi.enableMUX();
+
+  // Set SoftAP parameters.
+  // bool setSoftAPParam (String ssid, String pwd, uint8_t chl=7, uint8_t ecn=4)
+  wifi.setSoftAPParam("ESP8266", "foobar");
+  
+  // Get the IP address of ESP8266.
+  String glip = wifi.getLocalIP();
+  DEBUG_SERIAL.print("Local Ip address: ");
+  DEBUG_SERIAL.println(glip);
 }
 
 int nivel = 0;
@@ -67,9 +70,23 @@ void loop()
     uint8_t buffer[TCP_BUFFER_SIZE];
     memset(buffer, 0, sizeof(uint8_t)*TCP_BUFFER_SIZE);
 
+    // Create TCP connection in single mode.
+    // createTCP (String addr, uint32_t port)
+    wifi.createTCP (1, "192.168.0.1", 80);
+    
     // Receive data from TCP or UDP builded already in single mode.
     // uint32_t recv (uint8_t *buffer, uint32_t buffer_size, uint32_t timeout=1000)
     wifi.recv(buffer, TCP_BUFFER_SIZE);
+    
+    wifi.releaseTCP();
+    
+    // tcp/http response
+    
+    int j = 0;
+    for(;j<TCP_BUFFER_SIZE; j++){
+      DEBUG_SERIAL.print((char)buffer[j]);
+    }
+    DEBUG_SERIAL.println("");
 
     //DEBUG_SERIAL.println(buffer);
     //delay(1000);
