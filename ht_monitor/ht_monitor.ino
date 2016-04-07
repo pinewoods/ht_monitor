@@ -80,7 +80,7 @@ void loop()
   char tcp_payload[HTTP_PAYLOAD_SIZE]="";
 
   dht_json_wrapper(json_payload, 64, dht.getHumidity(), dht.getTemperature());
-  http_wrapper(tcp_payload, HTTP_PAYLOAD_SIZE, json_payload, strlen(json_payload));
+  http_wrapper(tcp_payload, HTTP_PAYLOAD_SIZE, configuration.api_endpoint, json_payload, strlen(json_payload));
 
   DEBUG_SERIAL.print("strlen(tcp_payload): ");
   DEBUG_SERIAL.println(strlen(tcp_payload));
@@ -94,7 +94,9 @@ void loop()
   }
 
   // SEND DATA
-  bool tcp_error = wifi.createTCP ("192.168.0.134", 8000); // TODO: Parametric Endpoint
+  // bool tcp_error = wifi.createTCP ("192.168.0.134", 8000); // DEBUG
+  bool tcp_error = wifi.createTCP (configuration.api_ip_addr, configuration.api_tcp_port);
+
   // Create TCP connection in single mode.
   if(tcp_error==false){
     DEBUG_SERIAL.println("createTCP ERROR");
@@ -102,6 +104,9 @@ void loop()
     // Casting is needed
     //bool send (const uint8_t *buffer, uint32_t len) : Send data based on TCP or UDP builded already in single mode. 
     wifi.send ((uint8_t *)tcp_payload, (uint32_t) strlen(tcp_payload));
+
+    // recv (uint8_t *buffer, uint32_t buffer_size, uint32_t timeout=1000) : Receive data from TCP or UDP builded already in single mode. 
+    
     //bool releaseTCP (void) : Release TCP connection in single mode.
     wifi.releaseTCP();
   }
