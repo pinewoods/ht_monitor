@@ -4,6 +4,8 @@
 
 #define SSID_SIZE 32
 #define PASSWD_SIZE 32
+#define API_ENDPOINT_SIZE 32
+#define IPADDR_SIZE 16
 #define E2PROM_DEBUG
 
 #define RX_BUFFER_SIZE 64
@@ -41,6 +43,8 @@ struct config_t
     // Wifi connection data
     char ssid[SSID_SIZE];
     char passwd[PASSWD_SIZE];
+    char api_endpoint[API_ENDPOINT_SIZE];
+    char api_ip_addr[IPADDR_SIZE];
 } configuration;
 
 void htProtocolSetup();
@@ -49,10 +53,10 @@ void htProtocolLoop();
 
 void htProtocolSetup(){
   // DEBUG_SERIAL.begin(9600);
-  
+
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
-  
+
   EEPROM_readAnything(0, configuration);
 
   attachInterrupt(ISR_ADDR, htProtocolTrigger, RISING);
@@ -91,6 +95,10 @@ void htProtocolLoop(){
       DEBUG_SERIAL.println(configuration.ssid);
       DEBUG_SERIAL.print("PASSWD: ");
       DEBUG_SERIAL.println(configuration.passwd);
+      DEBUG_SERIAL.print("API_IP_ADDR: ");
+      DEBUG_SERIAL.println(configuration.api_ip_addr);
+      DEBUG_SERIAL.print("API_ENDPOINT: ");
+      DEBUG_SERIAL.println(configuration.api_endpoint);
     #endif
 
     while(1){
@@ -156,6 +164,44 @@ void htProtocolLoop(){
                     error_flag = ERROR_RESPONSE;
                 }
             }
+            /* ********************** API IP ADDR ********************** */
+
+             if(strstr(buffer, "GET API_IP_ADDR")){
+                DEBUG_SERIAL.println(configuration.api_ip_addr);
+                error_flag = OK_RESPONSE;
+             }
+
+            if(strstr(buffer, "SET API_IP_ADDR")){
+                sscanf(buffer, "SET API_IP_ADDR \"%[^\"]", svalue);
+
+                if(svalue){
+                    strcpy(configuration.api_ip_addr, svalue);
+                    EEPROM_writeAnything(0, configuration);
+                    error_flag = OK_RESPONSE;
+                }else{
+                    error_flag = ERROR_RESPONSE;
+                }
+            }
+            /* ********************** API ENDPOINT ********************** */
+
+             if(strstr(buffer, "GET API_ENDPOINT")){
+                DEBUG_SERIAL.println(configuration.api_endpoint);
+                error_flag = OK_RESPONSE;
+             }
+
+            if(strstr(buffer, "SET API_ENDPOINT")){
+                sscanf(buffer, "SET API_ENDPOINT \"%[^\"]", svalue);
+
+                if(svalue){
+                    strcpy(configuration.api_endpoint, svalue);
+                    EEPROM_writeAnything(0, configuration);
+                    error_flag = OK_RESPONSE;
+                }else{
+                    error_flag = ERROR_RESPONSE;
+                }
+            }
+
+
             /* ********************** END ********************** */
 
             // No valid command found
