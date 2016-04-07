@@ -45,6 +45,7 @@ struct config_t
     char passwd[PASSWD_SIZE];
     char api_endpoint[API_ENDPOINT_SIZE];
     char api_ip_addr[IPADDR_SIZE];
+    uint16_t  api_tcp_port;
 } configuration;
 
 void htProtocolSetup();
@@ -97,6 +98,8 @@ void htProtocolLoop(){
       DEBUG_SERIAL.println(configuration.passwd);
       DEBUG_SERIAL.print("API_IP_ADDR: ");
       DEBUG_SERIAL.println(configuration.api_ip_addr);
+      DEBUG_SERIAL.print("API_TCP_PORT: ");
+      DEBUG_SERIAL.println(configuration.api_tcp_port);
       DEBUG_SERIAL.print("API_ENDPOINT: ");
       DEBUG_SERIAL.println(configuration.api_endpoint);
     #endif
@@ -200,7 +203,24 @@ void htProtocolLoop(){
                     error_flag = ERROR_RESPONSE;
                 }
             }
+            /* ********************** API ENDPOINT ********************** */
 
+             if(strstr(buffer, "GET API_TCP_PORT")){
+                DEBUG_SERIAL.println(configuration.api_tcp_port);
+                error_flag = OK_RESPONSE;
+             }
+
+            if(strstr(buffer, "SET API_TCP_PORT")){
+                sscanf(buffer, "SET API_TCP_PORT \"%[^\"]", svalue);
+
+                if(svalue){
+                    strcpy(configuration.api_tcp_port, svalue);
+                    EEPROM_writeAnything(0, configuration);
+                    error_flag = OK_RESPONSE;
+                }else{
+                    error_flag = ERROR_RESPONSE;
+                }
+            }
 
             /* ********************** END ********************** */
 
