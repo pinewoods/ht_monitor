@@ -14,6 +14,7 @@ bool dht_json_wrapper(char *json_payload,
 
 bool http_wrapper(char *tcp_payload,
                                   const uint8_t len_tcp_payload,
+                                  const char *api_endpoint,
                                   const char *http_payload,
                                   const uint8_t len_http_payload){
 
@@ -29,9 +30,9 @@ bool http_wrapper(char *tcp_payload,
     len_http_payload -> strlen of your POST request
     */
 
-    // HTTP headers - 93 bytes + strlen(%d) + strlen(%s)
+    // HTTP headers - 87 bytes + strlen(%s) + strlen(%d) + strlen(%s)
     const char http_headers[] =
-    "POST /api2/ HTTP/1.0\r\n" // TODO: Parametric Endpoint
+    "POST %s HTTP/1.0\r\n"
     "Content-Type:application/json \r\n"
     "Connection: close\r\n"
     "Content-Length: %d\r\n"
@@ -39,7 +40,7 @@ bool http_wrapper(char *tcp_payload,
     "%s";
 
     memset(tcp_payload, 0, len_tcp_payload);
-    sprintf(tcp_payload, http_headers, len_http_payload, http_payload);
+    sprintf(tcp_payload, api_endpoint, http_headers, len_http_payload, http_payload);
 
     return true;
 }
